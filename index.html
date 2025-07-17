@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Curricular Interactiva</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+    }
+    .semester {
+      background: #ffffff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .semester h3 {
+      text-align: center;
+    }
+    .course {
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .locked { background-color: #ccc; color: #555; }
+    .available { background-color: #4dabf7; color: white; }
+    .in-progress { background-color: #f1c40f; color: black; }
+    .completed { background-color: #2ecc71; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular Interactiva</h1>
+  <div class="grid" id="grid-container"></div>
+
+  <script>
+    const semesters = 8;
+    const coursesPerSemester = [6,6,6,6,7,6,6,6];
+    const prerequisites = {
+      // Ejemplo: "c8": ["c1", "c2"]
+    };
+
+    const grid = document.getElementById('grid-container');
+
+    let courseId = 1;
+    for (let i = 0; i < semesters; i++) {
+      const sem = document.createElement('div');
+      sem.className = 'semester';
+      sem.innerHTML = '<h3>Semestre ' + (i+1) + '</h3>';
+      for (let j = 0; j < coursesPerSemester[i]; j++) {
+        const c = document.createElement('div');
+        c.className = 'course locked';
+        c.textContent = 'Ramo ' + courseId;
+        c.dataset.id = 'c' + courseId;
+        c.dataset.state = 'locked';
+        c.addEventListener('click', () => toggleCourse(c));
+        sem.appendChild(c);
+        courseId++;
+      }
+      grid.appendChild(sem);
+    }
+
+    function toggleCourse(el) {
+      const current = el.dataset.state;
+      if (current === 'available') {
+        el.dataset.state = 'in-progress';
+        el.className = 'course in-progress';
+      } else if (current === 'in-progress') {
+        el.dataset.state = 'completed';
+        el.className = 'course completed';
+        updateAvailableCourses();
+      }
+    }
+
+    function updateAvailableCourses() {
+      const allCourses = document.querySelectorAll('.course');
+      allCourses.forEach(el => {
+        const id = el.dataset.id;
+        const prereqs = prerequisites[id] || [];
+        const completed = prereqs.every(pr => {
+          const prereqEl = document.querySelector('[data-id="' + pr + '"]');
+          return prereqEl && prereqEl.dataset.state === 'completed';
+        });
+        if (el.dataset.state === 'locked' && completed) {
+          el.dataset.state = 'available';
+          el.className = 'course available';
+        }
+      });
+    }
+
+    updateAvailableCourses();
+  </script>
+</body>
+</html>
