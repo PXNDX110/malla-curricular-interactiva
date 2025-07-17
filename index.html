@@ -9,94 +9,79 @@
       background: #f0f0f0;
       padding: 20px;
     }
-    .grid {
+    .semestre {
+      margin-bottom: 20px;
+    }
+    .semestre h2 {
+      margin-bottom: 10px;
+    }
+    .ramos {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 10px;
     }
-    .semester {
-      background: #ffffff;
+    .ramo {
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .semester h3 {
-      text-align: center;
-    }
-    .course {
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 4px;
+      border-radius: 8px;
       text-align: center;
       cursor: pointer;
-      transition: background-color 0.3s;
+      font-size: 14px;
     }
-    .locked { background-color: #ccc; color: #555; }
-    .available { background-color: #4dabf7; color: white; }
-    .in-progress { background-color: #f1c40f; color: black; }
-    .completed { background-color: #2ecc71; color: white; }
+    .gris { background-color: #ccc; }
+    .azul { background-color: #8ecae6; }
+    .amarillo { background-color: #ffb703; }
+    .verde { background-color: #90be6d; }
   </style>
 </head>
 <body>
   <h1>Malla Curricular Interactiva</h1>
-  <div class="grid" id="grid-container"></div>
+
+  <div id="malla"></div>
 
   <script>
-    const semesters = 8;
-    const coursesPerSemester = [6,6,6,6,7,6,6,6];
-    const prerequisites = {
-      // Ejemplo: "c8": ["c1", "c2"]
+    const ramosPorSemestre = [
+      ["CÁLCULO I PARA INGENIERÍA", "ÁLGEBRA I PARA INGENIERÍA", "FÍSICA I PARA INGENIERÍA", "TALLER DE DESARROLLO PERSONAL E INTEGRAL", "INTRODUCCIÓN A LA INGENIERÍA", "MÉTODOS DE ESTUDIO"],
+      ["CÁLCULO II PARA INGENIERÍA", "ÁLGEBRA II PARA INGENIERÍA", "FÍSICA II PARA INGENIERÍA", "FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN", "QUÍMICA GENERAL", "INTRODUCCIÓN A LA INGENIERÍA INDUSTRIAL"],
+      ["ANÁLISIS ESTADÍSTICO PARA INGENIERÍA", "ELECTRICIDAD Y MAGNETISMO PARA INGENIERÍA", "COMUNICACIÓN EFECTIVA", "INGLÉS I", "TECNOLOGÍA DE LOS MATERIALES", "MÉTODOS GRÁFICOS - INDUSTRIAS"],
+      ["FUNDAMENTOS DE ECONOMÍA", "INGLÉS II", "ESTADÍSTICA APLICADA", "INGENIERÍA DE MÉTODOS", "ELECTROTECNIA", "DISEÑO ESTRUCTURAL"],
+      ["INGLÉS III", "PROCESOS INDUSTRIALES", "ADMINISTRACIÓN", "FACTORES HUMANOS Y ERGONOMÍA", "OPTIMIZACIÓN", "CONTABILIDAD Y COSTOS INDUSTRIALES", "MÁQUINAS Y EQUIPOS INDUSTRIALES"],
+      ["INGLÉS IV", "SISTEMAS DE GESTIÓN", "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "TALLER DE GESTIÓN Y LIDERAZGO", "DESARROLLO DE PRODUCTOS", "SISTEMAS DE INFORMACIÓN"],
+      ["ELECTIVO A", "GESTIÓN DE OPERACIONES", "GESTIÓN DE SERVICIOS", "INGENIERÍA ECONÓMICA", "PROYECTO DE TITULACIÓN", "", ""],
+      ["ELECTIVO B", "TÓPICO PROFESIONAL I", "TÓPICO PROFESIONAL II", "TALLER DE GESTIÓN DE OPERACIONES", "TRABAJO DE TITULACIÓN", "", ""]
+    ];
+
+    const estadoSiguiente = {
+      "gris": "azul",
+      "azul": "amarillo",
+      "amarillo": "verde",
+      "verde": "azul"
     };
 
-    const grid = document.getElementById('grid-container');
+    const malla = document.getElementById("malla");
 
-    let courseId = 1;
-    for (let i = 0; i < semesters; i++) {
-      const sem = document.createElement('div');
-      sem.className = 'semester';
-      sem.innerHTML = '<h3>Semestre ' + (i+1) + '</h3>';
-      for (let j = 0; j < coursesPerSemester[i]; j++) {
-        const c = document.createElement('div');
-        c.className = 'course locked';
-        c.textContent = 'Ramo ' + courseId;
-        c.dataset.id = 'c' + courseId;
-        c.dataset.state = 'locked';
-        c.addEventListener('click', () => toggleCourse(c));
-        sem.appendChild(c);
-        courseId++;
-      }
-      grid.appendChild(sem);
-    }
+    ramosPorSemestre.forEach((ramos, i) => {
+      const div = document.createElement("div");
+      div.className = "semestre";
+      div.innerHTML = `<h2>Semestre ${i + 1}</h2>`;
 
-    function toggleCourse(el) {
-      const current = el.dataset.state;
-      if (current === 'available') {
-        el.dataset.state = 'in-progress';
-        el.className = 'course in-progress';
-      } else if (current === 'in-progress') {
-        el.dataset.state = 'completed';
-        el.className = 'course completed';
-        updateAvailableCourses();
-      }
-    }
+      const contenedor = document.createElement("div");
+      contenedor.className = "ramos";
 
-    function updateAvailableCourses() {
-      const allCourses = document.querySelectorAll('.course');
-      allCourses.forEach(el => {
-        const id = el.dataset.id;
-        const prereqs = prerequisites[id] || [];
-        const completed = prereqs.every(pr => {
-          const prereqEl = document.querySelector('[data-id="' + pr + '"]');
-          return prereqEl && prereqEl.dataset.state === 'completed';
-        });
-        if (el.dataset.state === 'locked' && completed) {
-          el.dataset.state = 'available';
-          el.className = 'course available';
-        }
+      ramos.forEach((nombre, j) => {
+        if (!nombre) return;
+        const ramo = document.createElement("div");
+        ramo.className = "ramo gris";
+        ramo.textContent = nombre;
+        ramo.onclick = () => {
+          const actual = ramo.className.split(" ").pop();
+          ramo.className = `ramo ${estadoSiguiente[actual]}`;
+        };
+        contenedor.appendChild(ramo);
       });
-    }
 
-    updateAvailableCourses();
+      div.appendChild(contenedor);
+      malla.appendChild(div);
+    });
   </script>
 </body>
 </html>
