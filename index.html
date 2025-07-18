@@ -26,6 +26,7 @@
       text-align: center;
       cursor: pointer;
       font-size: 14px;
+      background-color: #ccc;
     }
     .gris { background-color: #ccc; }
     .azul { background-color: #8ecae6; }
@@ -35,7 +36,6 @@
 </head>
 <body>
   <h1>Malla Curricular Interactiva</h1>
-
   <div id="malla"></div>
 
   <script>
@@ -46,9 +46,52 @@
       ["FUNDAMENTOS DE ECONOMÍA", "INGLÉS II", "ESTADÍSTICA APLICADA", "INGENIERÍA DE MÉTODOS", "ELECTROTECNIA", "DISEÑO ESTRUCTURAL"],
       ["INGLÉS III", "PROCESOS INDUSTRIALES", "ADMINISTRACIÓN", "FACTORES HUMANOS Y ERGONOMÍA", "OPTIMIZACIÓN", "CONTABILIDAD Y COSTOS INDUSTRIALES", "MÁQUINAS Y EQUIPOS INDUSTRIALES"],
       ["INGLÉS IV", "SISTEMAS DE GESTIÓN", "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "TALLER DE GESTIÓN Y LIDERAZGO", "DESARROLLO DE PRODUCTOS", "SISTEMAS DE INFORMACIÓN"],
-      ["ELECTIVO A", "GESTIÓN DE OPERACIONES", "GESTIÓN DE SERVICIOS", "INGENIERÍA ECONÓMICA", "PROYECTO DE TITULACIÓN", "", ""],
-      ["ELECTIVO B", "TÓPICO PROFESIONAL I", "TÓPICO PROFESIONAL II", "TALLER DE GESTIÓN DE OPERACIONES", "TRABAJO DE TITULACIÓN", "", ""]
+      ["ELECTIVO A", "GESTIÓN DE OPERACIONES", "GESTIÓN DE SERVICIOS", "INGENIERÍA ECONÓMICA", "PROYECTO DE TITULACIÓN"],
+      ["ELECTIVO B", "TÓPICO PROFESIONAL I", "TÓPICO PROFESIONAL II", "TALLER DE GESTIÓN DE OPERACIONES", "TRABAJO DE TITULACIÓN"]
     ];
+
+    const prerrequisitos = {
+      "CÁLCULO II PARA INGENIERÍA": ["CÁLCULO I PARA INGENIERÍA"],
+      "ÁLGEBRA II PARA INGENIERÍA": ["ÁLGEBRA I PARA INGENIERÍA"],
+      "FÍSICA II PARA INGENIERÍA": ["FÍSICA I PARA INGENIERÍA"],
+      "FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN": ["ÁLGEBRA I PARA INGENIERÍA"],
+      "INTRODUCCIÓN A LA INGENIERÍA INDUSTRIAL": ["INTRODUCCIÓN A LA INGENIERÍA"],
+      "ANÁLISIS ESTADÍSTICO PARA INGENIERÍA": ["CÁLCULO II PARA INGENIERÍA"],
+      "ELECTRICIDAD Y MAGNETISMO PARA INGENIERÍA": ["CÁLCULO II PARA INGENIERÍA", "FÍSICA II PARA INGENIERÍA"],
+      "COMUNICACIÓN EFECTIVA": ["TALLER DE DESARROLLO PERSONAL E INTEGRAL"],
+      "INGLÉS I": ["MÉTODOS DE ESTUDIO"],
+      "TECNOLOGÍA DE LOS MATERIALES": ["QUÍMICA GENERAL"],
+      "MÉTODOS GRÁFICOS - INDUSTRIAS": ["FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN"],
+      "FUNDAMENTOS DE ECONOMÍA": ["CÁLCULO I PARA INGENIERÍA"],
+      "INGLÉS II": ["INGLÉS I"],
+      "ESTADÍSTICA APLICADA": ["ANÁLISIS ESTADÍSTICO PARA INGENIERÍA"],
+      "INGENIERÍA DE MÉTODOS": ["ANÁLISIS ESTADÍSTICO PARA INGENIERÍA"],
+      "ELECTROTECNIA": ["ELECTRICIDAD Y MAGNETISMO PARA INGENIERÍA"],
+      "DISEÑO ESTRUCTURAL": ["TECNOLOGÍA DE LOS MATERIALES"],
+      "INGLÉS III": ["INGLÉS II"],
+      "PROCESOS INDUSTRIALES": ["TECNOLOGÍA DE LOS MATERIALES"],
+      "ADMINISTRACIÓN": ["FUNDAMENTOS DE ECONOMÍA"],
+      "FACTORES HUMANOS Y ERGONOMÍA": ["INGENIERÍA DE MÉTODOS"],
+      "OPTIMIZACIÓN": ["FUNDAMENTOS DE ECONOMÍA"],
+      "CONTABILIDAD Y COSTOS INDUSTRIALES": ["FUNDAMENTOS DE ECONOMÍA"],
+      "MÁQUINAS Y EQUIPOS INDUSTRIALES": ["DISEÑO ESTRUCTURAL"],
+      "INGLÉS IV": ["INGLÉS III"],
+      "SISTEMAS DE GESTIÓN": ["ADMINISTRACIÓN"],
+      "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES": ["MÁQUINAS Y EQUIPOS INDUSTRIALES"],
+      "TALLER DE GESTIÓN Y LIDERAZGO": ["FUNDAMENTOS DE ECONOMÍA", "INGLÉS II", "ESTADÍSTICA APLICADA", "INGENIERÍA DE MÉTODOS", "ELECTROTECNIA", "DISEÑO ESTRUCTURAL"],
+      "DESARROLLO DE PRODUCTOS": ["FACTORES HUMANOS Y ERGONOMÍA"],
+      "SISTEMAS DE INFORMACIÓN": ["ADMINISTRACIÓN"],
+      "ELECTIVO A": ["DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "TALLER DE GESTIÓN Y LIDERAZGO", "SISTEMAS DE INFORMACIÓN"],
+      "GESTIÓN DE OPERACIONES": ["OPTIMIZACIÓN", "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES"],
+      "GESTIÓN DE SERVICIOS": ["ADMINISTRACIÓN"],
+      "INGENIERÍA ECONÓMICA": ["CONTABILIDAD Y COSTOS INDUSTRIALES"],
+      "PROYECTO DE TITULACIÓN": ["DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "SISTEMAS DE INFORMACIÓN"],
+      "ELECTIVO B": ["ELECTIVO A"],
+      "TÓPICO PROFESIONAL I": ["ELECTIVO A"],
+      "TÓPICO PROFESIONAL II": ["ELECTIVO A"],
+      "TALLER DE GESTIÓN DE OPERACIONES": ["GESTIÓN DE OPERACIONES", "INGENIERÍA ECONÓMICA"],
+      "TRABAJO DE TITULACIÓN": ["PROYECTO DE TITULACIÓN"]
+    };
 
     const estadoSiguiente = {
       "gris": "azul",
@@ -58,6 +101,7 @@
     };
 
     const malla = document.getElementById("malla");
+    const ramoElements = {};
 
     ramosPorSemestre.forEach((ramos, i) => {
       const div = document.createElement("div");
@@ -67,16 +111,29 @@
       const contenedor = document.createElement("div");
       contenedor.className = "ramos";
 
-      ramos.forEach((nombre, j) => {
+      ramos.forEach(nombre => {
         if (!nombre) return;
         const ramo = document.createElement("div");
         ramo.className = "ramo gris";
         ramo.textContent = nombre;
+        ramo.dataset.nombre = nombre;
         ramo.onclick = () => {
           const actual = ramo.className.split(" ").pop();
-          ramo.className = `ramo ${estadoSiguiente[actual]}`;
+          const nuevo = estadoSiguiente[actual];
+          if (nuevo === "azul" && prerrequisitos[nombre]) {
+            const cumplido = prerrequisitos[nombre].every(pr => {
+              const elem = ramoElements[pr];
+              return elem && elem.classList.contains("verde");
+            });
+            if (!cumplido) {
+              alert("Debes aprobar todos los prerrequisitos primero: " + prerrequisitos[nombre].join(", "));
+              return;
+            }
+          }
+          ramo.className = `ramo ${nuevo}`;
         };
         contenedor.appendChild(ramo);
+        ramoElements[nombre] = ramo;
       });
 
       div.appendChild(contenedor);
