@@ -2,22 +2,23 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malla Curricular Interactiva</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
+      background-color: #f0f0f0;
+      margin: 20px;
+    }
+    .malla {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+      justify-items: center;
     }
     .semestre {
-      margin-bottom: 20px;
-    }
-    .semestre h2 {
-      margin-bottom: 10px;
-    }
-    .ramos {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
     .ramo {
@@ -25,32 +26,33 @@
       border-radius: 8px;
       text-align: center;
       cursor: pointer;
-      font-size: 14px;
-      background-color: #ccc;
+      color: white;
+      font-weight: bold;
+      transition: background-color 0.3s;
     }
-    .gris { background-color: #ccc; }
-    .azul { background-color: #8ecae6; }
-    .amarillo { background-color: #ffb703; }
-    .verde { background-color: #90be6d; }
+    .gris { background-color: gray; }
+    .azul { background-color: #007BFF; }
+    .amarillo { background-color: #FFC107; color: black; }
+    .verde { background-color: #28a745; }
   </style>
 </head>
 <body>
   <h1>Malla Curricular Interactiva</h1>
-  <div id="malla"></div>
+  <div class="malla" id="malla"></div>
 
   <script>
-    const ramosPorSemestre = [
-      ["CÁLCULO I PARA INGENIERÍA", "ÁLGEBRA I PARA INGENIERÍA", "FÍSICA I PARA INGENIERÍA", "TALLER DE DESARROLLO PERSONAL E INTEGRAL", "INTRODUCCIÓN A LA INGENIERÍA", "MÉTODOS DE ESTUDIO"],
-      ["CÁLCULO II PARA INGENIERÍA", "ÁLGEBRA II PARA INGENIERÍA", "FÍSICA II PARA INGENIERÍA", "FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN", "QUÍMICA GENERAL", "INTRODUCCIÓN A LA INGENIERÍA INDUSTRIAL"],
-      ["ANÁLISIS ESTADÍSTICO PARA INGENIERÍA", "ELECTRICIDAD Y MAGNETISMO PARA INGENIERÍA", "COMUNICACIÓN EFECTIVA", "INGLÉS I", "TECNOLOGÍA DE LOS MATERIALES", "MÉTODOS GRÁFICOS - INDUSTRIAS"],
-      ["FUNDAMENTOS DE ECONOMÍA", "INGLÉS II", "ESTADÍSTICA APLICADA", "INGENIERÍA DE MÉTODOS", "ELECTROTECNIA", "DISEÑO ESTRUCTURAL"],
-      ["INGLÉS III", "PROCESOS INDUSTRIALES", "ADMINISTRACIÓN", "FACTORES HUMANOS Y ERGONOMÍA", "OPTIMIZACIÓN", "CONTABILIDAD Y COSTOS INDUSTRIALES", "MÁQUINAS Y EQUIPOS INDUSTRIALES"],
-      ["INGLÉS IV", "SISTEMAS DE GESTIÓN", "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "TALLER DE GESTIÓN Y LIDERAZGO", "DESARROLLO DE PRODUCTOS", "SISTEMAS DE INFORMACIÓN"],
-      ["ELECTIVO A", "GESTIÓN DE OPERACIONES", "GESTIÓN DE SERVICIOS", "INGENIERÍA ECONÓMICA", "PROYECTO DE TITULACIÓN"],
-      ["ELECTIVO B", "TÓPICO PROFESIONAL I", "TÓPICO PROFESIONAL II", "TALLER DE GESTIÓN DE OPERACIONES", "TRABAJO DE TITULACIÓN"]
+    const ramos = [
+      ["INTRODUCCIÓN A LA INGENIERÍA", "TALLER DE DESARROLLO PERSONAL E INTEGRAL", "ÁLGEBRA I PARA INGENIERÍA", "CÁLCULO I PARA INGENIERÍA", "FÍSICA I PARA INGENIERÍA", "QUÍMICA GENERAL"],
+      ["INTRODUCCIÓN A LA INGENIERÍA INDUSTRIAL", "FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN", "ÁLGEBRA II PARA INGENIERÍA", "CÁLCULO II PARA INGENIERÍA", "FÍSICA II PARA INGENIERÍA", "MÉTODOS DE ESTUDIO"],
+      ["COMUNICACIÓN EFECTIVA", "ANÁLISIS ESTADÍSTICO PARA INGENIERÍA", "ELECTRICIDAD Y MAGNETISMO PARA INGENIERÍA", "TECNOLOGÍA DE LOS MATERIALES", "FUNDAMENTOS DE ECONOMÍA", "INGLÉS I"],
+      ["ESTADÍSTICA APLICADA", "INGENIERÍA DE MÉTODOS", "DISEÑO ESTRUCTURAL", "INGLÉS II", "ADMINISTRACIÓN", "ELECTROTECNIA"],
+      ["FACTORES HUMANOS Y ERGONOMÍA", "OPTIMIZACIÓN", "PROCESOS INDUSTRIALES", "CONTABILIDAD Y COSTOS INDUSTRIALES", "MÁQUINAS Y EQUIPOS INDUSTRIALES", "INGLÉS III", "DISEÑO INDUSTRIAL"],
+      ["SISTEMAS DE INFORMACIÓN", "SISTEMAS DE GESTIÓN", "INGLÉS IV", "DESARROLLO DE PRODUCTOS", "TALLER DE GESTIÓN Y LIDERAZGO", "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES"],
+      ["GESTIÓN DE SERVICIOS", "GESTIÓN DE OPERACIONES", "INGENIERÍA ECONÓMICA", "ELECTIVO A", "PROYECTO DE TITULACIÓN"],
+      ["ELECTIVO B", "TÓPICO PROFESIONAL 1", "TÓPICO PROFESIONAL 2", "TALLER DE GESTIÓN DE OPERACIONES", "TRABAJO DE TITULACIÓN"]
     ];
 
-    const prerrequisitos = {
+    const prerequisitos = {
       "CÁLCULO II PARA INGENIERÍA": ["CÁLCULO I PARA INGENIERÍA"],
       "ÁLGEBRA II PARA INGENIERÍA": ["ÁLGEBRA I PARA INGENIERÍA"],
       "FÍSICA II PARA INGENIERÍA": ["FÍSICA I PARA INGENIERÍA"],
@@ -61,7 +63,7 @@
       "COMUNICACIÓN EFECTIVA": ["TALLER DE DESARROLLO PERSONAL E INTEGRAL"],
       "INGLÉS I": ["MÉTODOS DE ESTUDIO"],
       "TECNOLOGÍA DE LOS MATERIALES": ["QUÍMICA GENERAL"],
-      "MÉTODOS GRÁFICOS - INDUSTRIAS": ["FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN"],
+      "MÉTODOS GRÁFICOS-INDUSTRIAS": ["FUNDAMENTOS DE COMPUTACIÓN Y PROGRAMACIÓN"],
       "FUNDAMENTOS DE ECONOMÍA": ["CÁLCULO I PARA INGENIERÍA"],
       "INGLÉS II": ["INGLÉS I"],
       "ESTADÍSTICA APLICADA": ["ANÁLISIS ESTADÍSTICO PARA INGENIERÍA"],
@@ -74,7 +76,7 @@
       "FACTORES HUMANOS Y ERGONOMÍA": ["INGENIERÍA DE MÉTODOS"],
       "OPTIMIZACIÓN": ["FUNDAMENTOS DE ECONOMÍA"],
       "CONTABILIDAD Y COSTOS INDUSTRIALES": ["FUNDAMENTOS DE ECONOMÍA"],
-      "MÁQUINAS Y EQUIPOS INDUSTRIALES": ["DISEÑO ESTRUCTURAL"],
+      "MÁQUINAS Y EQUIPOS INDUSTRIALES": ["DISEÑO INDUSTRIAL"],
       "INGLÉS IV": ["INGLÉS III"],
       "SISTEMAS DE GESTIÓN": ["ADMINISTRACIÓN"],
       "DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES": ["MÁQUINAS Y EQUIPOS INDUSTRIALES"],
@@ -87,58 +89,53 @@
       "INGENIERÍA ECONÓMICA": ["CONTABILIDAD Y COSTOS INDUSTRIALES"],
       "PROYECTO DE TITULACIÓN": ["DISEÑO DE SISTEMAS DE PRODUCCIÓN Y OPERACIONES", "SISTEMAS DE INFORMACIÓN"],
       "ELECTIVO B": ["ELECTIVO A"],
-      "TÓPICO PROFESIONAL I": ["ELECTIVO A"],
-      "TÓPICO PROFESIONAL II": ["ELECTIVO A"],
+      "TÓPICO PROFESIONAL 1": ["ELECTIVO A"],
+      "TÓPICO PROFESIONAL 2": ["ELECTIVO A"],
       "TALLER DE GESTIÓN DE OPERACIONES": ["GESTIÓN DE OPERACIONES", "INGENIERÍA ECONÓMICA"],
       "TRABAJO DE TITULACIÓN": ["PROYECTO DE TITULACIÓN"]
-    };
-
-    const estadoSiguiente = {
-      "gris": "azul",
-      "azul": "amarillo",
-      "amarillo": "verde",
-      "verde": "azul"
     };
 
     const malla = document.getElementById("malla");
     const ramoElements = {};
 
-    ramosPorSemestre.forEach((ramos, i) => {
-      const div = document.createElement("div");
-      div.className = "semestre";
-      div.innerHTML = `<h2>Semestre ${i + 1}</h2>`;
+    ramos.forEach((semestre, colIndex) => {
+      const col = document.createElement("div");
+      col.classList.add("semestre");
+      semestre.forEach(nombre => {
+        const div = document.createElement("div");
+        div.className = "ramo gris";
+        div.textContent = nombre;
 
-      const contenedor = document.createElement("div");
-      contenedor.className = "ramos";
+        // Nivel 1 y Química en azul
+        if (colIndex === 0 || nombre === "QUÍMICA GENERAL") div.className = "ramo azul";
 
-      ramos.forEach(nombre => {
-        if (!nombre) return;
-        const ramo = document.createElement("div");
-        ramo.className = "ramo gris";
-        ramo.textContent = nombre;
-        ramo.dataset.nombre = nombre;
-        ramo.onclick = () => {
-          const actual = ramo.className.split(" ").pop();
-          const nuevo = estadoSiguiente[actual];
-          if (nuevo === "azul" && prerrequisitos[nombre]) {
-            const cumplido = prerrequisitos[nombre].every(pr => {
-              const elem = ramoElements[pr];
-              return elem && elem.classList.contains("verde");
-            });
-            if (!cumplido) {
-              alert("Debes aprobar todos los prerrequisitos primero: " + prerrequisitos[nombre].join(", "));
-              return;
-            }
+        div.onclick = () => {
+          if (div.classList.contains("azul")) {
+            div.className = "ramo amarillo";
+          } else if (div.classList.contains("amarillo")) {
+            div.className = "ramo verde";
+            actualizarRamosDisponibles();
+          } else if (div.classList.contains("verde")) {
+            div.className = "ramo gris";
           }
-          ramo.className = `ramo ${nuevo}`;
         };
-        contenedor.appendChild(ramo);
-        ramoElements[nombre] = ramo;
-      });
 
-      div.appendChild(contenedor);
-      malla.appendChild(div);
+        ramoElements[nombre] = div;
+        col.appendChild(div);
+      });
+      malla.appendChild(col);
     });
+
+    function actualizarRamosDisponibles() {
+      Object.entries(prerequisitos).forEach(([ramo, prereqs]) => {
+        if (!ramoElements[ramo]) return;
+        const div = ramoElements[ramo];
+        if (div.classList.contains("gris")) {
+          const desbloquear = prereqs.every(p => ramoElements[p]?.classList.contains("verde"));
+          if (desbloquear) div.className = "ramo azul";
+        }
+      });
+    }
   </script>
 </body>
 </html>
